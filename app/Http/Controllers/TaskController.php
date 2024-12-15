@@ -43,35 +43,43 @@ class TaskController extends Controller
         return response()->json($tasks, 200);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/tasks",
-     *     tags={"Tasks"},
-     *     summary="Create a new task",
-     *     description="Adds a new task to the user's list",
-     *     security={{"bearerAuth": {}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"title"},
-     *             @OA\Property(property="title", type="string", example="Buy groceries"),
-     *             @OA\Property(property="due_date", type="string", format="date", example="2024-11-01")
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Task created")
-     * )
-     */
+/**
+ * @OA\Post(
+ *     path="/tasks",
+ *     tags={"Tasks"},
+ *     summary="Create a new task",
+ *     description="Adds a new task to the user's list",
+ *     security={{"bearerAuth": {}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"title"},
+ *             @OA\Property(property="title", type="string", example="Buy groceries"),
+ *             @OA\Property(
+ *                 property="due_date",
+ *                 type="string",
+ *                 format="date-time",
+ *                 example="2024-11-01T14:30:00",
+ *                 description="The due date and time for the task (ISO 8601 format, optional)"
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(response=201, description="Task created")
+ * )
+ */
+
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|date_format:Y-m-d H:i:s',
         ]);
 
         $task = Task::create([
             'title' => $request->title,
             'due_date' => $request->due_date,
             'user_id' => Auth::id(),
+            'is_completed' => false,
         ]);
 
         return response()->json($task, 201);
@@ -159,43 +167,6 @@ class TaskController extends Controller
     }
 
 
-    public function sendWhatsAppMessage($id)
-    {
-        $task = Task::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-        
-        Log::info('Key nya adalah: '.env('FONNTE_KEY'));
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => env('FONNTE_KEY')
-            ])->post('https://api.fonnte.com/send', [
-                'target' => Auth::user()->no_telp,
-                'message' => 'MANNNNTAP Task anda: **'.$task->title.'** Jangan Lupa dikerjakan. Terima kasih.',
-            ]);
-
-            if ($response->successful()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'WhatsApp message sent successfully',
-                    'data' => $response->json()
-                ]);
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to send WhatsApp message',
-                'error' => $response->json()
-            ], 400);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error sending WhatsApp message',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-
     public function checkAndSendReminders()
     {
         Log::info('ini bukan main');
@@ -212,8 +183,6 @@ class TaskController extends Controller
 
             $results = [];
 
-            Log::info('Found ' . $tasks->count() . ' tasks to process');
-            Log::info('Found ' . $tasks->count() . ' tasks to process');
 
             foreach ($tasks as $task) {
                 if (!$task->user->no_telp) {
@@ -234,8 +203,6 @@ class TaskController extends Controller
                     $task->user->no_telp,
                     $message
                 );
-
-                Log::info($response['data']);
 
                 if ($response['success']) {
                     $messageLog->update([
@@ -266,8 +233,6 @@ class TaskController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::info('Aduh Exception');
-            Log::info($e->getMessage());
             return response()->json([
                 'message' => 'Error processing reminders',
                 'error' => $e->getMessage()

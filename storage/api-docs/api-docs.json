@@ -91,6 +91,12 @@
                                     "password": {
                                         "type": "string",
                                         "example": "secret123"
+                                    },
+                                    "no_telp": {
+                                        "description": "Phone number of the user, optional",
+                                        "type": "string",
+                                        "example": "081234567890",
+                                        "nullable": true
                                     }
                                 },
                                 "type": "object"
@@ -168,9 +174,10 @@
                                         "example": "Buy groceries"
                                     },
                                     "due_date": {
+                                        "description": "The due date and time for the task (ISO 8601 format, optional)",
                                         "type": "string",
-                                        "format": "date",
-                                        "example": "2024-11-01"
+                                        "format": "date-time",
+                                        "example": "2024-11-01T14:30:00"
                                     }
                                 },
                                 "type": "object"

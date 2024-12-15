@@ -71,19 +71,21 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             required={"username", "password"},
      *             @OA\Property(property="username", type="string", example="johndoe"),
-     *             @OA\Property(property="password", type="string", example="secret123")
+     *             @OA\Property(property="password", type="string", example="secret123"),
+     *             @OA\Property(property="no_telp", type="string", nullable=true, example="081234567890", description="Phone number of the user, optional")
      *         )
      *     ),
      *     @OA\Response(response=201, description="User registered"),
      *     @OA\Response(response=400, description="Validation failed")
      * )
      */
+
     public function register(Request $request)
     {
         $request->validate([
             'username' => 'required|unique:users',
             'password' => 'required|min:6',
-            'no_telp' => 'nullable|min:10|max:13',
+            'no_telp' => 'nullable|min:10|max:14',
         ]);
 
         $user = User::create([

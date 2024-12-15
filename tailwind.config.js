@@ -1,20 +1,21 @@
-import defaultTheme from 'tailwindcss/defaultTheme';
-
 /** @type {import('tailwindcss').Config} */
-export default {
-    content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './storage/framework/views/*.php',
-        './resources/**/*.blade.php',
-        './resources/**/*.js',
-        './resources/**/*.vue',
-    ],
-    theme: {
-        extend: {
-            fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-            },
-        },
+module.exports = {
+  content: [
+    "./resources/**/*.blade.php",
+    "./resources/**/*.js",
+    "./resources/**/*.vue",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        'primary-blue': '#2196F3',    // Material Design Blue
+        'secondary-blue': '#90CAF9',  // Light Blue
+        'background-white': '#FFFFFF'
+      },
+      fontFamily: {
+        'roboto': ['Roboto', 'sans-serif']
+      }
     },
-    plugins: [],
-};
+  },
+  plugins: [],
+}

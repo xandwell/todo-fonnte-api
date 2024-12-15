@@ -16,7 +16,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('tasks/{id}/complete', [TaskController::class, 'markComplete']);  // Mark task as complete
     Route::delete('tasks/{id}', [TaskController::class, 'destroy']);  // Delete task
     Route::post('logout', [AuthController::class, 'logout']);  // Logout user
-
-    Route::get('tasks/{id}/sendMessage', [TaskController::class, 'sendWhatsAppMessage']);
 });
-

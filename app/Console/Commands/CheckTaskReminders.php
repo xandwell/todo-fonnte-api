@@ -19,7 +19,7 @@ class CheckTaskReminders extends Command
      *
      * @var string
      */
-    protected $description = 'Check and send reminders for upcoming tasks';
+    protected $description = 'Check reminder untuk tiap task yang belum selesai';
 
     /**
      * Execute the console command.
